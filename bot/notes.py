@@ -5,8 +5,10 @@ from collections import defaultdict
 
 NOTES_FILE = Path(__file__).resolve().parent / "resources" / "notes.json"
 
+
 def debug(msg):
     print(f"[🐾 note debug] {msg}", flush=True)
+
 
 def load_notes():
     if not NOTES_FILE.exists():
@@ -14,10 +16,12 @@ def load_notes():
     with open(NOTES_FILE, "r") as f:
         return json.load(f)
 
+
 def save_notes(notes):
     NOTES_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(NOTES_FILE, "w") as f:
         json.dump(notes, f, ensure_ascii=False, indent=2)
+
 
 def handle_note_message(user_text, user_id="unknown"):
     notes = load_notes()
@@ -29,11 +33,9 @@ def handle_note_message(user_text, user_id="unknown"):
             if not content:
                 return "汪？筆記內容好像是空的耶，要不要再說一次？"
 
-            notes.append({
-                "user": user_id,
-                "text": content,
-                "timestamp": datetime.now().isoformat()
-            })
+            notes.append(
+                {"user": user_id, "text": content, "timestamp": datetime.now().isoformat()}
+            )
             save_notes(notes)
             return f"🐶 筆記我記下來了喔：『{content}』"
         except Exception as e:

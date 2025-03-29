@@ -5,8 +5,10 @@ from pathlib import Path
 
 BIRTHDAY_FILE = Path(__file__).resolve().parent / "resources" / "birthdays.json"
 
+
 def debug(msg):
     print(f"[🐾 birthday debug] {msg}", file=sys.stdout, flush=True)
+
 
 def load_birthdays():
     try:
@@ -69,16 +71,15 @@ def handle_birthday_message(user_text):
 
         lines = [f"{name}：{date}" for name, date in birthdays.items()]
         return "🐶 我記得這些人的生日喔～\n" + "\n".join(lines)
-        
+
     return "汪？我聽不懂這句話呢，可以問我記得誰的生日？"
-    
+
+
 def check_today_birthdays():
     today = datetime.now().strftime("%m/%d")
     birthdays = load_birthdays()
     messages = []
     for name, date in birthdays.items():
         if date == today:
-            messages.append(
-                f"🎉 汪汪！今天是 {name} 的生日～祝你骨頭吃到飽、玩具永不壞！🎂"
-            )
+            messages.append(f"🎉 汪汪！今天是 {name} 的生日～祝你骨頭吃到飽、玩具永不壞！🎂")
     return messages

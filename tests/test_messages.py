@@ -36,10 +36,11 @@ def test_get_weekly_summary_with_data(monkeypatch):
     now = datetime.now().isoformat()
     messages = [
         {"user": "Alice", "text": "會議時間是週三", "timestamp": now},
-        {"user": "Bob", "text": "房子看起來不錯", "timestamp": now}
+        {"user": "Bob", "text": "房子看起來不錯", "timestamp": now},
     ]
     with open(TEST_LOG_FILE, "w") as f:
         import json
+
         json.dump(messages, f)
 
     summary = logger_module.get_weekly_summary()

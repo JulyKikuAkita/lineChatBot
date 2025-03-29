@@ -1,7 +1,7 @@
 # Makefile for line-dog-bot 🐶
 
 install:
-	pip install -r requirements.txt
+	pip install -r requirements-dev.txt
 
 test:
 	PYTHONPATH=. pytest

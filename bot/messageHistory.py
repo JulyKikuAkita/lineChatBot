@@ -6,8 +6,10 @@ import sys
 
 LOG_FILE = "message_log.json"
 
+
 def debug(msg):
     print(f"[🐾 birthday debug] {msg}", file=sys.stdout, flush=True)
+
 
 def log_message(user, text):
     log = load_log()
@@ -21,11 +23,10 @@ def load_log():
         return []
     with open(LOG_FILE, "r") as f:
         return json.load(f)
-        
+
+
 def is_noise(text: str) -> bool:
-    command_keywords = [
-        "記住", "狗狗週報", "你記得誰的生日", "生日是幾號", "汪汪總結"
-    ]
+    command_keywords = ["記住", "狗狗週報", "你記得誰的生日", "生日是幾號", "汪汪總結"]
     return any(keyword in text for keyword in command_keywords)
 
 
@@ -35,9 +36,9 @@ def get_weekly_summary():
     week_ago = now - timedelta(days=7)
 
     recent_msgs = [
-        entry for entry in log
-        if datetime.fromisoformat(entry["timestamp"]) >= week_ago
-        and not is_noise(entry["text"])
+        entry
+        for entry in log
+        if datetime.fromisoformat(entry["timestamp"]) >= week_ago and not is_noise(entry["text"])
     ]
 
     # Remove duplicates
@@ -53,7 +54,7 @@ def get_weekly_summary():
         return "🐶 嗷嗚～這週大家都很安靜耶，狗狗也沒聽到什麼事呢。"
 
     # Statistics
-    user_counts = Counter(entry['user'] for entry in unique_msgs)
+    user_counts = Counter(entry["user"] for entry in unique_msgs)
     total_msgs = len(unique_msgs)
     top_user, top_count = user_counts.most_common(1)[0]
 

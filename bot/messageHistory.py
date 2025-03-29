@@ -4,15 +4,13 @@ import os
 
 LOG_FILE = "message_log.json"
 
+
 def log_message(user, text):
     log = load_log()
-    log.append({
-        "user": user,
-        "text": text,
-        "timestamp": datetime.now().isoformat()
-    })
+    log.append({"user": user, "text": text, "timestamp": datetime.now().isoformat()})
     with open(LOG_FILE, "w") as f:
         json.dump(log, f, ensure_ascii=False, indent=2)
+
 
 def load_log():
     if not os.path.exists(LOG_FILE):
@@ -20,13 +18,13 @@ def load_log():
     with open(LOG_FILE, "r") as f:
         return json.load(f)
 
+
 def get_weekly_summary():
     log = load_log()
     now = datetime.now()
     week_ago = now - timedelta(days=7)
     recent_msgs = [
-        entry for entry in log
-        if datetime.fromisoformat(entry["timestamp"]) >= week_ago
+        entry for entry in log if datetime.fromisoformat(entry["timestamp"]) >= week_ago
     ]
 
     if not recent_msgs:

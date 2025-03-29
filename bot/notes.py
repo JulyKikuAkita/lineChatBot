@@ -29,7 +29,10 @@ def handle_note_message(user_text, user_id="unknown"):
     # ➕ 新增筆記
     if "記住筆記" in user_text:
         try:
-            content = user_text.split("記住筆記：")[-1].strip()
+            if "：" in user_text:
+                content = user_text.split("記住筆記：")[-1].strip()
+            else:
+                return "汪～你要記什麼筆記呢？請用『記住筆記：內容』的格式來教我！🐾"
             if not content:
                 return "汪？筆記內容好像是空的耶，要不要再說一次？"
 

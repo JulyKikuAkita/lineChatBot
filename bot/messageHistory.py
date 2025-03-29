@@ -26,7 +26,22 @@ def load_log():
 
 
 def is_noise(text: str) -> bool:
-    command_keywords = ["記住", "狗狗週報", "你記得誰的生日", "生日是幾號", "汪汪總結"]
+    command_keywords = [
+        "狗狗週報",
+        "汪汪總結",
+        "記住",
+        "你記得誰的生日",
+        "生日是幾號",
+        "幫助",
+        "狗狗指令",
+        "來一首詩",
+        "詩",
+        "筆記清單",
+        "刪除筆記",
+        "我記得什麼",
+        "/機密",
+        "/secret",
+    ]
     return any(keyword in text for keyword in command_keywords)
 
 

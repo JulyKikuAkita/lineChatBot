@@ -72,7 +72,7 @@ def handle_birthday_message(user_text):
         lines = [f"{name}：{date}" for name, date in birthdays.items()]
         return "🐶 我記得這些人的生日喔～\n" + "\n".join(lines)
 
-    return "汪？我聽不懂這句話呢，可以問我記得誰的生日？"
+    return None
 
 
 def check_today_birthdays():

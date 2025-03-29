@@ -10,6 +10,6 @@ format:
 	black .
 
 lint:
-	ruff check .
+	ruff check . --fix
 
 all: install format lint test

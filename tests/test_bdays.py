@@ -1,4 +1,3 @@
-import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -37,7 +36,7 @@ def test_handle_birthday_message_valid():
 def test_handle_birthday_message_invalid_format():
     msg = "生日是媽媽 3/29"
     result = birthday_module.handle_birthday_message(msg)
-    assert "汪？我聽不懂這句話呢，可以問我記得誰的生日？" in result
+    assert result is None
 
 
 def test_check_stored_birthday():

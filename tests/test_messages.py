@@ -1,7 +1,6 @@
-import os
 import tempfile
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import pytest

@@ -161,6 +161,7 @@ cython_debug/
 
 # Custom for this project
 message_log.json
+bot/resources/memory.json
 resources/birthdays.json
 .DS_Store
 .replit

@@ -5,12 +5,13 @@ from pathlib import Path
 from datetime import datetime
 import pytest
 
+import bot.wishes as birthday_module
+
 # Patch BIRTHDAY_FILE before importing
 TEMP_DIR = tempfile.mkdtemp()
 TEST_BIRTHDAY_FILE = Path(TEMP_DIR) / "birthdays.json"
 
 # Patch the module's BIRTHDAY_FILE to point to test file
-import bot.wishes as birthday_module
 birthday_module.BIRTHDAY_FILE = TEST_BIRTHDAY_FILE
 
 
@@ -36,7 +37,7 @@ def test_handle_birthday_message_valid():
 def test_handle_birthday_message_invalid_format():
     msg = "生日是媽媽 3/29"
     result = birthday_module.handle_birthday_message(msg)
-    assert "汪？我聽不懂這句話呢，要不要再說一次？" in result
+    assert "汪？我聽不懂這句話呢，可以問我記得誰的生日？" in result
 
 
 def test_check_stored_birthday():

@@ -78,3 +78,6 @@ You can customize the voice/personality to match your family style.
 ---
 
 ## 🤖 Hosted on Replit, GitHub-friendly, CI-ready!
+
+## Read more about line API
+https://github.com/line/line-bot-sdk-python/blob/master/README.rst

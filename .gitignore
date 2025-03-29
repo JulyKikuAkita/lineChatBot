@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 
 # Custom for this project
+message_log.json
 resources/birthdays.json
 .DS_Store
 .replit

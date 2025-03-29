@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
+import bot.messageHistory as logger_module
 
 # Setup temporary log file path
 TEMP_DIR = tempfile.mkdtemp()
 TEST_LOG_FILE = Path(TEMP_DIR) / "message_log.json"
 
 # Patch logger module
-import bot.messageHistory as logger_module
 logger_module.LOG_FILE = TEST_LOG_FILE
 
 
@@ -43,8 +43,8 @@ def test_get_weekly_summary_with_data(monkeypatch):
         json.dump(messages, f)
 
     summary = logger_module.get_weekly_summary()
-    assert "Alice 說" in summary
-    assert "Bob 說" in summary
+    assert "最活躍的是：Alice" in summary
+    assert "訊息統計：\n- 總共有 2 則訊息被記錄下來" in summary
 
 
 def test_get_weekly_summary_empty():

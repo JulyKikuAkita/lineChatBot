@@ -1,6 +1,5 @@
 # bot/line_helpers.py
 from linebot.v3.messaging.models import ReplyMessageRequest, PushMessageRequest, TextMessage
-import wishes
 
 
 def make_text_reply(reply_token: str, text: str, disable_notification=False) -> ReplyMessageRequest:
@@ -11,8 +10,7 @@ def make_text_reply(reply_token: str, text: str, disable_notification=False) -> 
     )
 
 
-def build_birthday_push_requests(group_id: str) -> list[PushMessageRequest]:
-    messages = wishes.check_today_birthdays()
+def build_birthday_push_requests(messages: list, group_id: str) -> list[PushMessageRequest]:
     push_requests = []
 
     for msg in messages:

@@ -64,17 +64,13 @@ def callback():
 # we need to handle the message event with HEAD ping
 @app.route("/trigger-birthday", methods=["GET", "HEAD"])
 def trigger_birthday():
-    messages = wishes.check_today_birthdays_custom()
-    send_daily_birthday_wishes(messages)
-
-    print(f"🎂 生日推播觸發，共送出 {len(messages)} 則")
+    send_daily_birthday_wishes()
     if request.method == "HEAD":
         return "", 200  # For UptimeRobot ping
 
     return jsonify(
         {
             "status": "ok",
-            "sent": len(messages),
             "timestamp": datetime.now(timezone("Asia/Taipei")).isoformat(),
         }
     )
@@ -155,22 +151,22 @@ def handle_message(event):
 
 
 # 可加排程：每天早上自動送生日祝賀
-def send_daily_birthday_wishes(messages=None):
+def send_daily_birthday_wishes():
     if has_already_sent_today():
         print("🎂 今天已經送過生日祝福了，不再重複推播")
         return
-    if messages is None:
-        messages = wishes.check_today_birthdays_custom()
+        
+    messages = wishes.check_today_birthdays_custom()
     group_id = os.getenv("FAMILY_LINE_CHANNEL_GROUPID")
 
     if not group_id:
         return "❗未設定 DEFAULT_GROUP_ID", 400
 
+    print(f"🎂 生日推播觸發，共送出 {len(messages)} 則")
     push_requests = build_birthday_push_requests(messages, group_id)
-    for message in push_requests:
-        line_bot_api.push_message(message)
+    for item in push_requests:
+        line_bot_api.push_message(item)
     mark_sent_today()
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)

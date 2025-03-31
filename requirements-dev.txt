@@ -6,3 +6,4 @@ line-bot-sdk>=3.16.3
 black
 pytest
 ruff
+pytz

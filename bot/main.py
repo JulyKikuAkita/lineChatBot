@@ -1,9 +1,10 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 from linebot.v3.webhook import WebhookHandler, MessageEvent
 from linebot.v3.webhooks import TextMessageContent
 from linebot.v3.messaging import Configuration, ApiClient, MessagingApi
 from linebot.v3.exceptions import InvalidSignatureError
-from line_helpers import make_text_reply
+from pytz import timezone
+from datetime import datetime
 import logging
 import os
 import wishes
@@ -12,6 +13,8 @@ import notes
 import memo
 from quick_reply_helper import make_quick_reply
 from poetry_api import get_random_poem, get_short_poem, get_sonnet
+from line_helpers import make_text_reply, build_birthday_push_requests
+from sent_wishes import has_already_sent_today, mark_sent_today
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -58,6 +61,21 @@ def callback():
     return "OK"
 
 
+# we need to handle the message event with HEAD ping
+@app.route("/trigger-birthday", methods=["GET", "HEAD"])
+def trigger_birthday():
+    send_daily_birthday_wishes()
+    if request.method == "HEAD":
+        return "", 200  # For UptimeRobot ping
+
+    return jsonify(
+        {
+            "status": "ok",
+            "timestamp": datetime.now(timezone("Asia/Taipei")).isoformat(),
+        }
+    )
+
+
 # @handler.default()
 # def default_handler(event):
 #     print(f"⚠️ Received unhandled event: {type(event)}", flush=True)
@@ -67,6 +85,7 @@ def callback():
 def handle_message(event):
     msg = event.message.text
     user_id = event.source.user_id if hasattr(event.source, "user_id") else "unknown"
+    print(event.source)
 
     logger.info(f"[RECEIVED] From {user_id}: {msg}")
     # 📝 記錄訊息（for 每週摘要）
@@ -109,6 +128,13 @@ def handle_message(event):
         line_bot_api.reply_message(reply)
         return
 
+    # 🎂 處理生日訊息
+    birthday_reply = wishes.handle_birthday_message(msg)
+    if birthday_reply:
+        reply = make_text_reply(event.reply_token, birthday_reply)
+        line_bot_api.reply_message(reply)
+        return
+
     # 🔑 機密
     memory_reply = memo.handle_memory_message(msg)
     if memory_reply:
@@ -123,20 +149,24 @@ def handle_message(event):
         line_bot_api.reply_message(reply)
         return
 
-    # 🎂 處理生日訊息
-    birthday_reply = wishes.handle_birthday_message(msg)
-    if birthday_reply:
-        reply = make_text_reply(event.reply_token, birthday_reply)
-        line_bot_api.reply_message(reply)
-        return
-
 
 # 可加排程：每天早上自動送生日祝賀
-# def send_daily_birthday_wishes():
-#     messages = wishes.check_today_birthdays()
-#     group_id = "你的群組 ID"  # TODO: 替換成你的實際群組 ID
-#     for msg in messages:
-#         line_bot_api.push_message(group_id, TextSendMessage(text=msg))
+def send_daily_birthday_wishes():
+    if has_already_sent_today():
+        print("🎂 今天已經送過生日祝福了，不再重複推播")
+        return
+        
+    messages = wishes.check_today_birthdays_custom()
+    group_id = os.getenv("FAMILY_LINE_CHANNEL_GROUPID")
+
+    if not group_id:
+        return "❗未設定 DEFAULT_GROUP_ID", 400
+
+    print(f"🎂 生日推播觸發，共送出 {len(messages)} 則")
+    push_requests = build_birthday_push_requests(messages, group_id)
+    for item in push_requests:
+        line_bot_api.push_message(item)
+    mark_sent_today()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)

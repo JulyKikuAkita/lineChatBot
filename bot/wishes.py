@@ -1,6 +1,8 @@
 import sys
 import json
+import random
 from datetime import datetime
+from pytz import timezone
 from pathlib import Path
 
 BIRTHDAY_FILE = Path(__file__).resolve().parent / "resources" / "birthdays.json"
@@ -75,11 +77,52 @@ def handle_birthday_message(user_text):
     return None
 
 
-def check_today_birthdays():
-    today = datetime.now().strftime("%m/%d")
+def check_today_birthdays_custom():
+    tz = timezone("Asia/Taipei")
+    today = datetime.now(tz).strftime("%m/%d")
+    print(f"🐾 [Birthday Debug] 今天是：{today}")
     birthdays = load_birthdays()
-    messages = []
+    print(f"📦 [Birthday Debug] 載入生日資料：{birthdays}")
+    wishes = []
+
+    emoji_styles = [
+        ["🐾", "🐶", "🐹", "🐰", "🐻"],
+        ["🎁", "💖", "🍰", "🎂", "🧁"],
+        ["🎊", "🌟", "🎉", "🎈", "✨"],
+        ["🪅", "🎇", "🎆", "🌟", "✨"],
+    ]
+
+    mainText = "{name} 生日快樂!"
+    templates = [
+        "十萬青年十萬肝，但你生日我擋班。願你今年少爆肝，多領紅包不還單。",
+        "年年生日都包金。雖然只夠買珍奶，但喝起來就甘心。",
+        "今日宜耍廢，宜與外送言歡。願你被奶茶溫柔以待，被狗狗視為主子，被老闆誤認為天才。",
+        "願你煩惱像髮量一樣稀少！",
+        "今日宜喜，宜緩，宜與歲月言歡。願你眉眼如初，風不驚心，雨不傷身。新歲更懂自己，也更被世界溫柔以待。",
+        "汪步輕隨入夢來，君生之日月明開。千帆過盡皆無憾，只願君心樂自懷。",
+        "風起時，請記得加件衣；我們未必常在，但惦記從不間斷。",
+    ]
+
+    def normalize(date_str):
+        parts = date_str.strip().split("/")
+        return f"{int(parts[0])}/{int(parts[1])}"
+
+    def build_border(characters, length):
+        return "".join(random.choices(characters, k=length))
+
     for name, date in birthdays.items():
-        if date == today:
-            messages.append(f"🎉 汪汪！今天是 {name} 的生日～祝你骨頭吃到飽、玩具永不壞！🎂")
-    return messages
+        match = normalize(date) == normalize(today)
+        print(f"🔍 檢查 {name} 的生日：{date} 是否等於今天？→ {match}")
+        if match:
+            message_text = mainText.format(name=name)
+            style = random.choice(emoji_styles)
+            max_length = 10
+            line_length = min(len(message_text), max_length)
+            border_line = build_border(style, line_length)
+            center = f" {message_text} "
+            top = f"{border_line}"
+            bottom = f"{border_line}"
+            wishes.append(f"{top}\n{center}\n{bottom}\n")
+            wishes.append("祝你 " + random.choice(templates))
+            print(f"✅ 已加入祝福：{name}")
+    return wishes

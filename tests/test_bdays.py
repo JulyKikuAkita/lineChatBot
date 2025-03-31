@@ -1,5 +1,7 @@
 import shutil
 import tempfile
+import json
+from pytz import timezone
 from pathlib import Path
 from datetime import datetime
 import pytest
@@ -47,10 +49,36 @@ def test_check_stored_birthday():
 
 
 def test_check_today_birthdays(monkeypatch):
-    today = datetime.now().strftime("%m/%d")
+    today = datetime.now(timezone("Asia/Taipei")).strftime("%m/%d")
     birthday_module.save_birthdays({"哥哥": today})
-    result = birthday_module.check_today_birthdays()
+    result = birthday_module.check_today_birthdays_custom()
     assert any("哥哥" in msg for msg in result)
+
+
+def test_birthday_match_today(monkeypatch):
+    today = datetime.now(timezone("Asia/Taipei")).strftime("%m/%d")
+    emojis = "🎉🐾🎂🎁💖🍰🧁🎊🌟✨🎈🐶🐹🐰🐻🪅🎇🎆"
+    with open(TEST_BIRTHDAY_FILE, "w") as f:
+        json.dump({"媽媽": today}, f)
+
+    messages = birthday_module.check_today_birthdays_custom()
+    assert len(messages) >= 1
+    for msg in messages:
+        lines = msg.splitlines()
+        if len(lines) > 1:
+            assert len(lines) == 3, "訊息應包含上框、中間、下框三行"
+            assert "媽媽" in lines[1], "中間行應包含壽星名字"
+            assert all(c in emojis for c in lines[0]), "上框包含應有 emoji"
+            assert all(c in emojis for c in lines[2]), "下框包含應有 emoji"
+            assert len(lines[0]) == len(lines[2]), "上框寬度應與下框寬度一致"
+
+
+def test_birthday_no_match():
+    with open(TEST_BIRTHDAY_FILE, "w") as f:
+        json.dump({"爸爸": "01/01"}, f)
+
+    messages = birthday_module.check_today_birthdays_custom()
+    assert messages == []
 
 
 def teardown_module(module):
